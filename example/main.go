@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/naponmeka/bsonparse/bsonparser"
-	"github.com/naponmeka/bsonparse/jsonparser"
+	"github.com/naponmeka/bsonparser"
 )
 
 func main() {
@@ -32,7 +31,7 @@ func main() {
 		"value": 3.14159,
 		"name": "pi5"
 	  }`
-	bsonStr, err := jsonparser.JsonToBson(jsonExt)
+	bsonStr, err := bsonparser.JsonToBson(jsonExt)
 	if err != nil {
 		log.Fatal(err)
 	}

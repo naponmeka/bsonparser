@@ -1,4 +1,4 @@
-package bsonparser
+package bsonparse
 
 import (
 	"bytes"

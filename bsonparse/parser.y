@@ -1,5 +1,5 @@
 %{
-package bsonparser
+package bsonparse
 
 type pair struct {
   key string

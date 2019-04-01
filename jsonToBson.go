@@ -1,4 +1,4 @@
-package jsonparser
+package bsonparser
 
 import (
 	"encoding/json"
@@ -118,5 +118,5 @@ func JsonToBsonIndent(jsonStr, prefix, indent string) (output string, err error)
 }
 
 func JsonToBson(jsonStr string) (output string, err error) {
-	return JsonToBsonIndent(jsonStr, "", "  ")
+	return JsonToBsonIndent(jsonStr, "", "    ")
 }
