@@ -51,7 +51,7 @@ func traverse(
 		if needBracket {
 			newResult := []string{}
 			for _, r := range results {
-				newResult = append(newResult, prefix+indent+"{"+r+"}")
+				newResult = append(newResult, prefix+indents+indents+"{"+strings.TrimSpace(r)+"}")
 			}
 			results = newResult
 		}
@@ -85,9 +85,8 @@ func traverse(
 			if hasRef {
 				return false, prefix + indents + castToString(parent) + ": " + childOutStr
 			} else if needBracket {
-				lesserIndents := strings.Repeat(indent, (level - 2))
 				return true, prefix + indents +
-					castToString(parent) + ": {" + nl + lesserIndents + childOutStr + nl + indent + "}"
+					castToString(parent) + ": {" + nl + childOutStr + nl + indents + "}"
 			} else {
 				return false, prefix + indents + castToString(parent) + ": " + childOutStr
 			}
