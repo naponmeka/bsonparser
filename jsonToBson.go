@@ -32,8 +32,8 @@ func traverse(
 	level int,
 	prefix string,
 	indent string,
-) (isLast bool,
-	jsonStr string) {
+) (bool, string) {
+	needBracket := false
 	nl := "\n"
 	if prefix == "" && indent == "" {
 		nl = ""
@@ -43,9 +43,17 @@ func traverse(
 	switch val := current.(type) {
 	case []interface{}:
 		results := []string{}
+		res := ""
 		for k, v := range val {
-			_, res := traverse(true, v, k, level, prefix, indent)
+			needBracket, res = traverse(true, v, k, level, prefix, indent)
 			results = append(results, res)
+		}
+		if needBracket {
+			newResult := []string{}
+			for _, r := range results {
+				newResult = append(newResult, prefix+indent+"{"+r+"}")
+			}
+			results = newResult
 		}
 		glue := "," + nl
 		childOutStr := strings.Join(results, glue)
@@ -55,11 +63,10 @@ func traverse(
 	case map[string]interface{}:
 		results := []string{}
 		hasRef := false
-		last := false
 		res := ""
 		for k, v := range val {
 			if castToString(k) != `"$ref"` && castToString(k) != `"$id"` {
-				last, res = traverse(false, v, k, level, prefix, indent)
+				needBracket, res = traverse(false, v, k, level, prefix, indent)
 				results = append(results, res)
 			} else {
 				hasRef = true
@@ -73,39 +80,37 @@ func traverse(
 		if level == 1 {
 			return false, fmt.Sprintf("{%s%s%s}", nl, childOutStr, nl)
 		} else if removeKey {
-			return false, prefix + indents + fmt.Sprintf("%s", childOutStr)
+			return true, prefix + indents + fmt.Sprintf("%s", childOutStr)
 		} else {
-			if last || hasRef {
-				return false, prefix + indents + fmt.Sprintf("%s: %s", castToString(parent), childOutStr)
-			} else {
+			if hasRef {
+				return false, prefix + indents + castToString(parent) + ": " + childOutStr
+			} else if needBracket {
 				lesserIndents := strings.Repeat(indent, (level - 2))
-				return false, prefix + indents +
+				return true, prefix + indents +
 					castToString(parent) + ": {" + nl + lesserIndents + childOutStr + nl + indent + "}"
+			} else {
+				return false, prefix + indents + castToString(parent) + ": " + childOutStr
 			}
 		}
 	default:
 		if castToString(parent) == `"$oid"` {
-			return true, fmt.Sprintf("ObjectId(%s)", castToString(val))
+			return false, fmt.Sprintf("ObjectId(%s)", castToString(val))
 		} else if castToString(parent) == `"$numberLong"` {
-			return true, fmt.Sprintf(`NumberLong(%s)`, castToString(val))
+			return false, fmt.Sprintf(`NumberLong(%s)`, castToString(val))
 		} else if castToString(parent) == `"$numberDecimal"` {
-			return true, fmt.Sprintf(`NumberDecimal(%s)`, castToString(val))
+			return false, fmt.Sprintf(`NumberDecimal(%s)`, castToString(val))
 		} else if castToString(parent) == `"$undefined"` {
-			return true, "undefined"
+			return false, "undefined"
 		} else if castToString(parent) == `"$minKey"` {
-			return true, "MinKey"
+			return false, "MinKey"
 		} else if castToString(parent) == `"$maxKey"` {
-			return true, "MaxKey"
+			return false, "MaxKey"
 		} else if removeKey {
-			return true, prefix + indents + fmt.Sprintf(`%s`, castToString(val))
+			return false, prefix + indents + fmt.Sprintf(`%s`, castToString(val))
 		} else if level == 2 {
-			return true, prefix + indents + fmt.Sprintf(`%s: %s`, castToString(parent), castToString(val))
-		} else {
-			lesserIndents := strings.Repeat(indent, (level - 2))
-			return true, "{" + nl + prefix + indents +
-				fmt.Sprintf("%s: %s", castToString(parent), castToString(val)) +
-				nl + prefix + lesserIndents + "}"
+			return false, prefix + indents + fmt.Sprintf(`%s: %s`, castToString(parent), castToString(val))
 		}
+		return true, prefix + indents + fmt.Sprintf("%s: %s", castToString(parent), castToString(val))
 	}
 }
 
