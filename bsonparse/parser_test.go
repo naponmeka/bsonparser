@@ -49,6 +49,12 @@ func TestParser(t *testing.T) {
 			"age": map[string]interface{}{"$maxKey": true},
 		},
 	}, {
+		input: `{"a": 1, "age": DBRef("<name>", "<id>")}`,
+		output: map[string]interface{}{
+			"a":   float64(1),
+			"age": map[string]interface{}{"$ref": "<name>", "$id": "<id>"},
+		},
+	}, {
 		input: `{"a": 1, "b": ["c", 2]}`,
 		output: map[string]interface{}{
 			"a": float64(1),

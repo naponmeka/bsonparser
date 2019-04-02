@@ -20,7 +20,7 @@ func setResult(l yyLexer, v map[string]interface{}) {
 
 %token LexError
 %token BsonError
-%token <val> String Number Literal ObjectID ISODate NumberLong NumberDecimal Undefined MinKey MaxKey
+%token <val> String Number Literal ObjectID ISODate NumberLong NumberDecimal Undefined MinKey MaxKey DBRef
 
 %type <obj> object members
 %type <pair> pair
@@ -87,19 +87,19 @@ value:
     $$ = $1
   }
 | array
-| ObjectID
+| ObjectID ')'
   {
     $$ = map[string]interface{}{"$id": $1}
   }
-| ISODate
+| ISODate ')'
   {
     $$ = map[string]interface{}{"$date": $1}
   }
-| NumberLong
+| NumberLong ')'
   {
     $$ = map[string]interface{}{"$numberLong": $1}
   }
-| NumberDecimal
+| NumberDecimal ')'
   {
     $$ = map[string]interface{}{"$numberDecimal": $1}
   }
@@ -115,4 +115,7 @@ value:
   {
     $$ = map[string]interface{}{"$maxKey": true}
   }
-
+| DBRef ',' String')'
+  {
+    $$ = map[string]interface{}{"$ref": $1, "$id": $3}
+  }

@@ -160,7 +160,7 @@ func (l *lex) scanObj(lval *yySymType) int {
 		if b == '"' && !isInside {
 			isInside = true
 		} else if b == '"' && isInside {
-			l.next()
+			// l.next()
 			lval.val = buf.String()
 			if objBuf.String() == "ObjectId(" && len(buf.String()) == 24 {
 				return ObjectID
@@ -170,6 +170,8 @@ func (l *lex) scanObj(lval *yySymType) int {
 				return NumberLong
 			} else if objBuf.String() == "NumberDecimal(" {
 				return NumberDecimal
+			} else if objBuf.String() == "DBRef(" {
+				return DBRef
 			} else {
 				return BsonError
 			}
