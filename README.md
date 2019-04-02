@@ -8,14 +8,15 @@ go get -u github.com/naponmeka/bsonparser
 ```
 
 ## Usage
-json -> bson
-```
-bsonStr, err := bsonparser.JsonToBson(jsonStr)
-```
 
 bson -> json
 ```
 jsonStr, err := bsonparser.BsonToJson(bsonStr)
+```
+
+json -> bson
+```
+bsonStr, err := bsonparser.JsonToBson(jsonStr)
 ```
 
 ## Example
