@@ -464,7 +464,7 @@ yynewstate:
 		}
 	case 15:
 		{
-			yyVAL.val = map[string]interface{}{"$id": yyS[yypt-1].val}
+			yyVAL.val = map[string]interface{}{"$oid": yyS[yypt-1].val}
 		}
 	case 16:
 		{
