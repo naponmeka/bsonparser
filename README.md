@@ -9,12 +9,12 @@ go get -u github.com/naponmeka/bsonparser
 
 ## Usage
 
-bson -> json
+BSON -> JSON
 ```
 jsonStr, err := bsonparser.BsonToJson(bsonStr)
 ```
 
-json -> bson
+JSON -> BSON
 ```
 bsonStr, err := bsonparser.JsonToBson(jsonStr)
 ```
@@ -113,6 +113,12 @@ fmt.Println(bsonStr)
 }
 
 ```
+## Todo
+- Regular Expression (data_regex)
+- Binary (data_binary)
+
+## Known issues
+- BSON needs to contain double quotes for the keys
 
 ## Acknowledgements
 Parser rules are derived from sougou's json parser [example](https://github.com/sougou/parser_tutorial)

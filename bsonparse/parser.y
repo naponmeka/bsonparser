@@ -89,7 +89,7 @@ value:
 | array
 | ObjectID ')'
   {
-    $$ = map[string]interface{}{"$id": $1}
+    $$ = map[string]interface{}{"$oid": $1}
   }
 | ISODate ')'
   {
