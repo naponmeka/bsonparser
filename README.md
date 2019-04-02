@@ -114,3 +114,8 @@ fmt.Println(bsonStr)
 
 ```
 
+## Acknowledgements
+Parser rules are derived from sougou's json parser [example](https://github.com/sougou/parser_tutorial)
+
+## Misc
+- [For more info](https://docs.mongodb.com/manual/reference/mongodb-extended-json) about bson and MongoDB Extended JSON
