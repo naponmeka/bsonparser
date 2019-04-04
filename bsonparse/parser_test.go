@@ -22,7 +22,7 @@ func TestParser(t *testing.T) {
 		input: `{"a": 1, "_id": ObjectId("5c99f90cf1c077b8fbb76089")}`,
 		output: map[string]interface{}{
 			"a":   float64(1),
-			"_id": map[string]interface{}{"$id": "5c99f90cf1c077b8fbb76089"},
+			"_id": map[string]interface{}{"$oid": "5c99f90cf1c077b8fbb76089"},
 		},
 	}, {
 		input: `{"a": 1, "date": ISODate("xxxx")}`,
@@ -90,6 +90,63 @@ func TestParser(t *testing.T) {
 	// 	input:   `invalid`,
 	// 	wantErr: `syntax error`,
 	// }
+	}
+	for _, tc := range testcases {
+		got, err := Parse([]byte("[" + tc.input + "]"))
+		var gotErr string
+		if err != nil {
+			gotErr = err.Error()
+		}
+		if gotErr != tc.wantErr {
+			t.Errorf(`%s err: %v, want %v`, tc.input, gotErr, tc.wantErr)
+		}
+		if !reflect.DeepEqual(got[0], tc.output) {
+			t.Errorf(`%s: %#v want %#v`, tc.input, got, tc.output)
+		}
+	}
+}
+
+func TestParserArray(t *testing.T) {
+	testcases := []struct {
+		input   string
+		output  []interface{}
+		wantErr string
+	}{{
+		input: `[{}]`,
+		output: []interface{}{
+			map[string]interface{}{},
+		},
+	}, {
+		input: `[{"a": 1}]`,
+		output: []interface{}{
+			map[string]interface{}{
+				"a": float64(1),
+			},
+		},
+	}, {
+		input: `[{"a": 1, "_id": ObjectId("5c99f90cf1c077b8fbb76089")}]`,
+		output: []interface{}{
+			map[string]interface{}{
+				"a":   float64(1),
+				"_id": map[string]interface{}{"$oid": "5c99f90cf1c077b8fbb76089"},
+			},
+		},
+	}, {
+		input: `[
+			{"a": 1, "_id": ObjectId("5c99f90cf1c077b8fbb76089")},
+			{"a": 2, "_id": ObjectId("5c99f90cf1c077b8fbb76080")}
+			]`,
+		output: []interface{}{
+			map[string]interface{}{
+				"a":   float64(1),
+				"_id": map[string]interface{}{"$oid": "5c99f90cf1c077b8fbb76089"},
+			},
+			map[string]interface{}{
+				"a":   float64(2),
+				"_id": map[string]interface{}{"$oid": "5c99f90cf1c077b8fbb76080"},
+			},
+		},
+	},
 	}
 	for _, tc := range testcases {
 		got, err := Parse([]byte(tc.input))

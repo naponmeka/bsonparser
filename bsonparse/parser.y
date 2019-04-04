@@ -6,7 +6,7 @@ type pair struct {
   val interface{}
 }
 
-func setResult(l yyLexer, v map[string]interface{}) {
+func setResult(l yyLexer, v []interface{}) {
   l.(*lex).result = v
 }
 %}
@@ -29,14 +29,18 @@ func setResult(l yyLexer, v map[string]interface{}) {
 %type <val> value
 
 
-%start object
+%start array
 
 %%
+array: '[' elements ']'
+  {
+    $$ = $2
+    setResult(yylex, $2)
+  }
 
 object: '{' members '}'
   {
     $$ = $2
-    setResult(yylex, $$)
   }
 
 members:
@@ -58,11 +62,6 @@ members:
 pair: String ':' value
   {
     $$ = pair{key: $1.(string), val: $3}
-  }
-
-array: '[' elements ']'
-  {
-    $$ = $2
   }
 
 elements:

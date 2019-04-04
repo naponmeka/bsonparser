@@ -9,7 +9,7 @@ type pair struct {
 	val interface{}
 }
 
-func setResult(l yyLexer, v map[string]interface{}) {
+func setResult(l yyLexer, v []interface{}) {
 	l.(*lex).result = v
 }
 
@@ -56,18 +56,18 @@ var (
 		93:    2,  // ']' (19x)
 		57348: 3,  // String (6x)
 		41:    4,  // ')' (5x)
-		123:   5,  // '{' (4x)
-		57363: 6,  // object (4x)
-		91:    7,  // '[' (3x)
-		57360: 8,  // array (3x)
-		57358: 9,  // DBRef (3x)
-		57352: 10, // ISODate (3x)
-		57350: 11, // Literal (3x)
-		57357: 12, // MaxKey (3x)
-		57356: 13, // MinKey (3x)
-		57349: 14, // Number (3x)
-		57354: 15, // NumberDecimal (3x)
-		57353: 16, // NumberLong (3x)
+		91:    5,  // '[' (4x)
+		57360: 6,  // array (4x)
+		123:   7,  // '{' (3x)
+		57358: 8,  // DBRef (3x)
+		57352: 9,  // ISODate (3x)
+		57350: 10, // Literal (3x)
+		57357: 11, // MaxKey (3x)
+		57356: 12, // MinKey (3x)
+		57349: 13, // Number (3x)
+		57354: 14, // NumberDecimal (3x)
+		57353: 15, // NumberLong (3x)
+		57363: 16, // object (3x)
 		57351: 17, // ObjectID (3x)
 		57355: 18, // Undefined (3x)
 		57365: 19, // value (3x)
@@ -88,10 +88,9 @@ var (
 		"']'",
 		"String",
 		"')'",
-		"'{'",
-		"object",
 		"'['",
 		"array",
+		"'{'",
 		"DBRef",
 		"ISODate",
 		"Literal",
@@ -100,6 +99,7 @@ var (
 		"Number",
 		"NumberDecimal",
 		"NumberLong",
+		"object",
 		"ObjectID",
 		"Undefined",
 		"value",
@@ -119,11 +119,11 @@ var (
 	yyReductions = map[int]struct{ xsym, components int }{
 		0:  {0, 1},
 		1:  {6, 3},
-		2:  {24, 0},
-		3:  {24, 1},
-		4:  {24, 3},
-		5:  {21, 3},
-		6:  {8, 3},
+		2:  {16, 3},
+		3:  {24, 0},
+		4:  {24, 1},
+		5:  {24, 3},
+		6:  {21, 3},
 		7:  {23, 0},
 		8:  {23, 1},
 		9:  {23, 3},
@@ -148,48 +148,48 @@ var (
 		// 0
 		{5: 25, 24},
 		{20: 23},
-		{21, 21, 3: 28, 21: 27, 24: 26},
-		{58, 57},
-		{20, 20},
+		{16, 2: 16, 29, 5: 25, 33, 27, 41, 35, 31, 40, 39, 30, 37, 36, 32, 34, 38, 28, 23: 26},
+		{58, 2: 57},
+		{20, 20, 3: 51, 21: 50, 24: 49},
 		// 5
-		{22: 29},
-		{3: 32, 5: 25, 35, 31, 36, 44, 38, 34, 43, 42, 33, 40, 39, 37, 41, 30},
-		{18, 18},
-		{16, 2: 16, 32, 5: 25, 35, 31, 36, 44, 38, 34, 43, 42, 33, 40, 39, 37, 41, 53, 23: 52},
+		{15, 2: 15},
 		{13, 13, 13},
-		// 10
 		{12, 12, 12},
 		{11, 11, 11},
 		{10, 10, 10},
+		// 10
 		{9, 9, 9},
-		{4: 51},
-		// 15
-		{4: 50},
-		{4: 49},
 		{4: 48},
+		{4: 47},
+		{4: 46},
+		{4: 45},
+		// 15
 		{4, 4, 4},
 		{3, 3, 3},
-		// 20
 		{2, 2, 2},
-		{45},
-		{3: 46},
-		{4: 47},
+		{42},
+		{3: 43},
+		// 20
+		{4: 44},
 		{1, 1, 1},
-		// 25
 		{5, 5, 5},
 		{6, 6, 6},
 		{7, 7, 7},
+		// 25
 		{8, 8, 8},
-		{55, 2: 54},
+		{55, 54},
+		{19, 19},
+		{22: 52},
+		{3: 29, 5: 25, 33, 27, 41, 35, 31, 40, 39, 30, 37, 36, 32, 34, 38, 53},
 		// 30
-		{15, 2: 15},
-		{17, 17, 17},
-		{3: 32, 5: 25, 35, 31, 36, 44, 38, 34, 43, 42, 33, 40, 39, 37, 41, 56},
-		{14, 2: 14},
+		{17, 17},
+		{21, 21, 21},
+		{3: 51, 21: 56},
+		{18, 18},
 		{22, 22, 22, 20: 22},
 		// 35
-		{3: 28, 21: 59},
-		{19, 19},
+		{3: 29, 5: 25, 33, 27, 41, 35, 31, 40, 39, 30, 37, 36, 32, 34, 38, 59},
+		{14, 2: 14},
 	}
 )
 
@@ -420,31 +420,31 @@ yynewstate:
 	switch r {
 	case 1:
 		{
-			yyVAL.obj = yyS[yypt-1].obj
-			setResult(yylex, yyVAL.obj)
+			yyVAL.val = yyS[yypt-1].list
+			setResult(yylex, yyS[yypt-1].list)
 		}
 	case 2:
 		{
-			yyVAL.obj = map[string]interface{}{}
+			yyVAL.obj = yyS[yypt-1].obj
 		}
 	case 3:
+		{
+			yyVAL.obj = map[string]interface{}{}
+		}
+	case 4:
 		{
 			yyVAL.obj = map[string]interface{}{
 				yyS[yypt-0].pair.key: yyS[yypt-0].pair.val,
 			}
 		}
-	case 4:
+	case 5:
 		{
 			yyS[yypt-2].obj[yyS[yypt-0].pair.key] = yyS[yypt-0].pair.val
 			yyVAL.obj = yyS[yypt-2].obj
 		}
-	case 5:
-		{
-			yyVAL.pair = pair{key: yyS[yypt-2].val.(string), val: yyS[yypt-0].val}
-		}
 	case 6:
 		{
-			yyVAL.val = yyS[yypt-1].list
+			yyVAL.pair = pair{key: yyS[yypt-2].val.(string), val: yyS[yypt-0].val}
 		}
 	case 7:
 		{
