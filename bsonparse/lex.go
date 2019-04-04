@@ -11,7 +11,7 @@ import (
 //go:generate goyacc -l -o parser.go parser.y
 
 // Parse parses the input and returs the result.
-func Parse(input []byte) (map[string]interface{}, error) {
+func Parse(input []byte) ([]interface{}, error) {
 	l := newLex(input)
 	_ = yyParse(l)
 	return l.result, l.err
@@ -20,7 +20,7 @@ func Parse(input []byte) (map[string]interface{}, error) {
 type lex struct {
 	input  []byte
 	pos    int
-	result map[string]interface{}
+	result []interface{}
 	err    error
 }
 

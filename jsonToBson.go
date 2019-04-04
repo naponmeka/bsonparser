@@ -113,14 +113,27 @@ func traverse(
 	}
 }
 
-func JsonToBsonIndent(jsonStr, prefix, indent string) (output string, err error) {
-	b := []byte(jsonStr)
-	var v interface{}
-	err = json.Unmarshal(b, &v)
-	_, output = traverse(false, v, v, 0, prefix, indent)
-	return
-}
-
 func JsonToBson(jsonStr string) (output string, err error) {
 	return JsonToBsonIndent(jsonStr, "", "    ")
+}
+
+func JsonToBsonIndent(jsonStr, prefix, indent string) (output string, err error) {
+	jsonStr = strings.TrimSpace(jsonStr)
+	isArray := strings.HasPrefix(jsonStr, "[")
+	b := []byte(jsonStr)
+	if isArray {
+		var results []string
+		var jsons []interface{}
+		err = json.Unmarshal(b, &jsons)
+		for _, j := range jsons {
+			_, res := traverse(false, j, j, 0, prefix, indent)
+			results = append(results, res)
+		}
+		output = "[\n" + strings.Join(results, ",\n") + "\n]\n"
+	} else {
+		var v interface{}
+		err = json.Unmarshal(b, &v)
+		_, output = traverse(false, v, v, 0, prefix, indent)
+	}
+	return
 }
