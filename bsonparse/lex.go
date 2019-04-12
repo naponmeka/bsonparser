@@ -155,12 +155,10 @@ func (l *lex) scanObj(lval *yySymType) int {
 	buf := bytes.NewBuffer(nil)
 	objBuf := bytes.NewBuffer(nil)
 	isInside := false
-	for {
-		b := l.next()
+	for b := l.next(); b != 0; b = l.next() {
 		if b == '"' && !isInside {
 			isInside = true
 		} else if b == '"' && isInside {
-			// l.next()
 			lval.val = buf.String()
 			if objBuf.String() == "ObjectId(" && len(buf.String()) == 24 {
 				return ObjectID
@@ -181,6 +179,7 @@ func (l *lex) scanObj(lval *yySymType) int {
 			objBuf.WriteByte(b)
 		}
 	}
+	return 0
 }
 
 func (l *lex) backup() {
