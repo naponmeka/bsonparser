@@ -63,17 +63,34 @@ func traverse(
 	case map[string]interface{}:
 		results := []string{}
 		hasRef := false
+		hasBinData := false
+		hasRegex := false
 		res := ""
 		for k, v := range val {
-			if castToString(k) != `"$ref"` && castToString(k) != `"$id"` {
+			if castToString(k) != `"$ref"` &&
+				castToString(k) != `"$id"` &&
+				castToString(k) != `"$binary"` &&
+				castToString(k) != `"$type"` &&
+				castToString(k) != `"$regex"` &&
+				castToString(k) != `"$options"` {
 				needBracket, res = traverse(false, v, k, level, prefix, indent)
 				results = append(results, res)
-			} else {
+			} else if castToString(k) == `"$ref"` || castToString(k) == `"$id"` {
 				hasRef = true
+			} else if castToString(k) == `"$binary"` || castToString(k) == `"$type"` {
+				hasBinData = true
+			} else if castToString(k) == `"$regex"` || castToString(k) == `"$options"` {
+				hasRegex = true
 			}
 		}
 		if hasRef {
 			results = append(results, fmt.Sprintf(`DBRef(%s, %s)`, castToString(val["$ref"]), castToString(val["$id"])))
+		}
+		if hasBinData {
+			results = append(results, fmt.Sprintf(`BinData(%s, %s)`, val["$type"], val["$binary"]))
+		}
+		if hasRegex {
+			results = append(results, fmt.Sprintf(`/%s/%s`, val["$regex"], val["$options"]))
 		}
 		glue := "," + nl
 		childOutStr := strings.Join(results, glue)

@@ -17,6 +17,8 @@ func main() {
 			"$ref": "<name>",
 			"$id": "<id>"
 		},
+		"raw": { "$binary": "<bindata>", "$type": "<t>" },
+		"reg": { "$regex": "<\"hello\"sRegex>", "$options": "<sOptions>" },
 		"_id": {
 			"$oid": "5c91e115214fc660b6ca650a"
 		},
