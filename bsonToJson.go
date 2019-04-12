@@ -21,6 +21,9 @@ func BsonToJsonIndent(bsonStr, prefix, indent string) (output string, err error)
 		bsonStr = fmt.Sprintf("[%s]", bsonStr)
 	}
 	res, err := bsonparse.Parse([]byte(bsonStr))
+	if err != nil {
+		return "", err
+	}
 	var outputB []byte
 	if !isArray {
 		outputB, err = json.Marshal(&res[0])
