@@ -29,16 +29,16 @@ func TestParser(t *testing.T) {
 			"a": "hello\n",
 		},
 	}, {
-		input: `{_id: "xxx"}`,
+		input: `{_id: "555"}`,
 		output: map[string]interface{}{
-			"_id": "xxx",
+			"_id": "555",
 		},
-		// }, {
-		// 	input: `{"a": 1, "_id": ObjectId("5c99f90cf1c077b8fbb76089")}`,
-		// 	output: map[string]interface{}{
-		// 		"a":   float64(1),
-		// 		"_id": map[string]interface{}{"$oid": "5c99f90cf1c077b8fbb76089"},
-		// 	},
+	}, {
+		input: `{"a": 1, "_id": ObjectId("5c99f90cf1c077b8fbb76089")}`,
+		output: map[string]interface{}{
+			"a":   float64(1),
+			"_id": map[string]interface{}{"$oid": "5c99f90cf1c077b8fbb76089"},
+		},
 		// }, {
 		// 	input: `{"a": 1, "date": ISODate("xxxx")}`,
 		// 	output: map[string]interface{}{

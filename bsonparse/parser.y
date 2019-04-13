@@ -94,9 +94,9 @@ Number
     $$ = $1
   }
 | array
-| ObjectID ')'
+| ObjectID '(' value ')'
   {
-    $$ = map[string]interface{}{"$oid": $1}
+    $$ = map[string]interface{}{"$oid": $3}
   }
 | ISODate ')'
   {

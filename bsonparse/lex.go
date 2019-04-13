@@ -36,7 +36,10 @@ func (l *lex) Lex(lval *yySymType) int {
 }
 
 func isLetter(b byte) bool {
-	return unicode.IsLetter(rune(b)) || b == '_'
+	return unicode.IsLetter(rune(b)) ||
+		unicode.IsDigit(rune(b)) ||
+		b == '_' ||
+		b == '+' || b == '-'
 }
 
 func (l *lex) scanNormal(lval *yySymType) int {
@@ -44,12 +47,12 @@ func (l *lex) scanNormal(lval *yySymType) int {
 		switch {
 		case unicode.IsSpace(rune(b)):
 			continue
-		// case b == '"':
-		// 	continue
+		case b == '"':
+			return int(b)
 		// return l.scanString(lval)
-		case unicode.IsDigit(rune(b)) || b == '+' || b == '-':
-			l.backup()
-			return l.scanNum(lval)
+		// case unicode.IsDigit(rune(b)) || b == '+' || b == '-':
+		// 	l.backup()
+		// 	return l.scanNum(lval)
 		case isLetter(b):
 			l.backup()
 			literal := l.scanLiteral(lval)
@@ -128,7 +131,7 @@ func (l *lex) scanLiteral(lval *yySymType) int {
 	buf := bytes.NewBuffer(nil)
 	counter := 0
 	for b := l.next(); b != 0; b = l.next() {
-		if isLetter(b) {
+		if isLetter(b) || strings.IndexByte(".+-eE", b) != -1 {
 			buf.WriteByte(b)
 		} else if b == '\\' {
 			// TODO: handle \uxxxx construct.
@@ -139,17 +142,29 @@ func (l *lex) scanLiteral(lval *yySymType) int {
 			buf.WriteByte(b2)
 		} else {
 			l.backup()
-			val, ok := literal[buf.String()]
+			currentStr := buf.String()
+			val, ok := literal[currentStr]
 			if !ok {
-				if buf.String() == "undefined" {
+				if currentStr == "undefined" {
 					return Undefined
-				} else if buf.String() == "MinKey" {
+				} else if currentStr == "MinKey" {
 					return MinKey
-				} else if buf.String() == "MaxKey" {
+				} else if currentStr == "MaxKey" {
 					return MaxKey
+				} else if currentStr == "ObjectId" && b == '(' {
+					return ObjectID
 				} else {
-					lval.val = buf.String()
-					return String
+					if b == '"' {
+						lval.val = currentStr
+						return String
+					}
+					val, err := strconv.ParseFloat(currentStr, 64)
+					if err != nil {
+						lval.val = currentStr
+						return String
+					}
+					lval.val = val
+					return Number
 					// for i := 0; i < counter-1; i++ {
 					// 	l.backup()
 					// }
