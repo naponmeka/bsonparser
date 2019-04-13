@@ -113,12 +113,6 @@ fmt.Println(bsonStr)
 }
 
 ```
-## Todo
-- Regular Expression (data_regex)
-- Binary (data_binary)
-
-## Known issues
-- BSON needs to contain double quotes for the keys
 
 ## Acknowledgements
 Parser rules are derived from sougou's json parser [example](https://github.com/sougou/parser_tutorial)
