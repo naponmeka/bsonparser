@@ -28,6 +28,11 @@ func TestParser(t *testing.T) {
 		output: map[string]interface{}{
 			"a": "hello\n",
 		},
+	}, {
+		input: `{_id: "xxx"}`,
+		output: map[string]interface{}{
+			"_id": "xxx",
+		},
 		// }, {
 		// 	input: `{"a": 1, "_id": ObjectId("5c99f90cf1c077b8fbb76089")}`,
 		// 	output: map[string]interface{}{

@@ -35,6 +35,10 @@ func (l *lex) Lex(lval *yySymType) int {
 	return l.scanNormal(lval)
 }
 
+func isLetter(b byte) bool {
+	return unicode.IsLetter(rune(b)) || b == '_'
+}
+
 func (l *lex) scanNormal(lval *yySymType) int {
 	for b := l.next(); b != 0; b = l.next() {
 		switch {
@@ -46,7 +50,7 @@ func (l *lex) scanNormal(lval *yySymType) int {
 		case unicode.IsDigit(rune(b)) || b == '+' || b == '-':
 			l.backup()
 			return l.scanNum(lval)
-		case unicode.IsLetter(rune(b)):
+		case isLetter(b):
 			l.backup()
 			literal := l.scanLiteral(lval)
 			if literal == LexError {
@@ -123,19 +127,17 @@ var literal = map[string]interface{}{
 func (l *lex) scanLiteral(lval *yySymType) int {
 	buf := bytes.NewBuffer(nil)
 	counter := 0
-	for {
-		b := l.next()
-		switch {
-		case unicode.IsLetter(rune(b)):
+	for b := l.next(); b != 0; b = l.next() {
+		if isLetter(b) {
 			buf.WriteByte(b)
-		case b == '\\':
-			// TODO(sougou): handle \uxxxx construct.
+		} else if b == '\\' {
+			// TODO: handle \uxxxx construct.
 			b2 := escape[l.next()]
 			if b2 == 0 {
 				return LexError
 			}
 			buf.WriteByte(b2)
-		default:
+		} else {
 			l.backup()
 			val, ok := literal[buf.String()]
 			if !ok {
@@ -159,6 +161,7 @@ func (l *lex) scanLiteral(lval *yySymType) int {
 		}
 		counter++
 	}
+	return LexError
 }
 
 func (l *lex) scanObj(lval *yySymType) int {
