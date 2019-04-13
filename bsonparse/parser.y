@@ -114,7 +114,7 @@ value:
   {
     $$ = map[string]interface{}{"$maxKey": true}
   }
-| DBRef ',' String')'
+| DBRef ',' String ')'
   {
     $$ = map[string]interface{}{"$ref": $1, "$id": $3}
   }

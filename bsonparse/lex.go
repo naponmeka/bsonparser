@@ -41,7 +41,8 @@ func (l *lex) scanNormal(lval *yySymType) int {
 		case unicode.IsSpace(rune(b)):
 			continue
 		case b == '"':
-			return l.scanString(lval)
+			continue
+			// return l.scanString(lval)
 		case unicode.IsDigit(rune(b)) || b == '+' || b == '-':
 			l.backup()
 			return l.scanNum(lval)
@@ -127,6 +128,13 @@ func (l *lex) scanLiteral(lval *yySymType) int {
 		switch {
 		case unicode.IsLetter(rune(b)):
 			buf.WriteByte(b)
+		case b == '\\':
+			// TODO(sougou): handle \uxxxx construct.
+			b2 := escape[l.next()]
+			if b2 == 0 {
+				return LexError
+			}
+			buf.WriteByte(b2)
 		default:
 			l.backup()
 			val, ok := literal[buf.String()]
@@ -138,10 +146,12 @@ func (l *lex) scanLiteral(lval *yySymType) int {
 				} else if buf.String() == "MaxKey" {
 					return MaxKey
 				} else {
-					for i := 0; i < counter-1; i++ {
-						l.backup()
-					}
-					return LexError
+					lval.val = buf.String()
+					return String
+					// for i := 0; i < counter-1; i++ {
+					// 	l.backup()
+					// }
+					// return LexError
 				}
 			}
 			lval.val = val
