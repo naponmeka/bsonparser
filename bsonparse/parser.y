@@ -94,21 +94,21 @@ Number
     $$ = $1
   }
 | array
-| ObjectID '(' value ')'
+| ObjectID '(' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$oid": $3}
+    $$ = map[string]interface{}{"$oid": $4}
   }
-| ISODate ')'
+| ISODate '(' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$date": $1}
+    $$ = map[string]interface{}{"$date": $4}
   }
-| NumberLong ')'
+| NumberLong '(' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$numberLong": $1}
+    $$ = map[string]interface{}{"$numberLong": $4}
   }
-| NumberDecimal ')'
+| NumberDecimal '(' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$numberDecimal": $1}
+    $$ = map[string]interface{}{"$numberDecimal": $4}
   }
 | Undefined
   {
@@ -122,7 +122,7 @@ Number
   {
     $$ = map[string]interface{}{"$maxKey": true}
   }
-| DBRef ',' String ')'
+| DBRef '(' '"' String '"' ',' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$ref": $1, "$id": $3}
+    $$ = map[string]interface{}{"$ref": $4, "$id": $8}
   }

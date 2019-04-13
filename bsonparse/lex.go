@@ -153,6 +153,14 @@ func (l *lex) scanLiteral(lval *yySymType) int {
 					return MaxKey
 				} else if currentStr == "ObjectId" && b == '(' {
 					return ObjectID
+				} else if currentStr == "ISODate" && b == '(' {
+					return ISODate
+				} else if currentStr == "NumberLong" && b == '(' {
+					return NumberLong
+				} else if currentStr == "NumberDecimal" && b == '(' {
+					return NumberDecimal
+				} else if currentStr == "DBRef" && b == '(' {
+					return DBRef
 				} else {
 					if b == '"' {
 						lval.val = currentStr

@@ -39,12 +39,12 @@ func TestParser(t *testing.T) {
 			"a":   float64(1),
 			"_id": map[string]interface{}{"$oid": "5c99f90cf1c077b8fbb76089"},
 		},
-		// }, {
-		// 	input: `{"a": 1, "date": ISODate("xxxx")}`,
-		// 	output: map[string]interface{}{
-		// 		"a":    float64(1),
-		// 		"date": map[string]interface{}{"$date": "xxxx"},
-		// 	},
+	}, {
+		input: `{"a": 1, "date": ISODate("xxxx")}`,
+		output: map[string]interface{}{
+			"a":    float64(1),
+			"date": map[string]interface{}{"$date": "xxxx"},
+		},
 	}, {
 		input: `{"a": 1, "age": undefined}`,
 		output: map[string]interface{}{
@@ -64,12 +64,12 @@ func TestParser(t *testing.T) {
 			"age": map[string]interface{}{"$maxKey": true},
 		},
 	}, {
-		// 	// 	input: `{"a": 1, "age": DBRef("<name>", "<id>")}`,
-		// 	// 	output: map[string]interface{}{
-		// 	// 		"a":   float64(1),
-		// 	// 		"age": map[string]interface{}{"$ref": "<name>", "$id": "<id>"},
-		// 	// 	},
-		// }, {
+		input: `{"a": 1, "age": DBRef("name", "id")}`,
+		output: map[string]interface{}{
+			"a":   float64(1),
+			"age": map[string]interface{}{"$ref": "name", "$id": "id"},
+		},
+	}, {
 		input: `{"a": 1, "b": ["c", 2]}`,
 		output: map[string]interface{}{
 			"a": float64(1),
