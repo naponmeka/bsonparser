@@ -3,7 +3,6 @@ package bsonparse
 import (
 	"bytes"
 	"errors"
-	"log"
 	"strconv"
 	"unicode"
 )
@@ -89,19 +88,11 @@ var literal = map[string]interface{}{
 	"null":  nil,
 }
 
-func isOpposite(left, right byte) bool {
-	return (left == '(' && right == ')') ||
-		(left == '{' && right == '}') ||
-		(left == '[' && right == ']')
-}
-
 func (l *lex) scanAll(lval *yySymType) int {
 	buf := bytes.NewBuffer(nil)
 	l.backup()
 	first := l.next()
-	log.Println("first", first, string(first))
 	for b := l.next(); b != 0; b = l.next() {
-		log.Println(b, string(b))
 		if b == '\\' {
 			// TODO: handle \uxxxx construct.
 			b2 := escape[l.next()]
@@ -110,11 +101,9 @@ func (l *lex) scanAll(lval *yySymType) int {
 			}
 			buf.WriteByte(b2)
 		} else if b == 0 ||
-			// isOpposite(first, b) ||
 			(unicode.IsSpace(rune(first)) && isSpecialCharNoQuote(b)) ||
 			(isSpecialCharNoQuote(first) && isSpecialCharNoQuote(b)) ||
 			(first == '"' && b == '"') {
-			log.Println("closed")
 			l.backup()
 			currentStr := buf.String()
 			val, ok := literal[currentStr]
@@ -151,6 +140,8 @@ func (l *lex) scanAll(lval *yySymType) int {
 			}
 			lval.val = val
 			return Literal
+		} else if unicode.IsSpace(rune(b)) {
+			continue
 		} else {
 			buf.WriteByte(b)
 		}
