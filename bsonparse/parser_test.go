@@ -46,6 +46,12 @@ func TestParser(t *testing.T) {
 			"date": map[string]interface{}{"$date": "xxxx"},
 		},
 	}, {
+		input: `{"a": 1, "image": BinData(jpg, xxx)}`,
+		output: map[string]interface{}{
+			"a":     float64(1),
+			"image": map[string]interface{}{"$binary": "xxx", "$type": "jpg"},
+		},
+	}, {
 		input: `{"a": 1, "age": undefined}`,
 		output: map[string]interface{}{
 			"a":   float64(1),

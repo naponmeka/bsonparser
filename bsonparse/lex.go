@@ -124,6 +124,8 @@ func (l *lex) scanAll(lval *yySymType) int {
 					return NumberDecimal
 				} else if currentStr == "DBRef" && b == '(' {
 					return DBRef
+				} else if currentStr == "BinData" && b == '(' {
+					return BinData
 				} else {
 					if b == '"' {
 						lval.val = currentStr

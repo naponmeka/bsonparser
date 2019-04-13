@@ -20,7 +20,7 @@ func setResult(l yyLexer, v []interface{}) {
 
 %token LexError
 %token BsonError
-%token <val> String Number Literal ObjectID ISODate NumberLong NumberDecimal Undefined MinKey MaxKey DBRef
+%token <val> String Number Literal ObjectID ISODate NumberLong NumberDecimal Undefined MinKey MaxKey DBRef BinData
 
 %type <obj> object members
 %type <pair> pair
@@ -125,4 +125,8 @@ Number
 | DBRef '(' '"' String '"' ',' '"' String '"' ')'
   {
     $$ = map[string]interface{}{"$ref": $4, "$id": $8}
+  }
+| BinData '(' String ',' String ')'
+  {
+    $$ = map[string]interface{}{"$binary": $5, "$type": $3}
   }

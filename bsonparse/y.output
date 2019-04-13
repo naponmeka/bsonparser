@@ -22,6 +22,7 @@ state 2 // '['
     '['            shift, and goto state 2
     ']'            reduce using rule 8 (elements)
     '{'            shift, and goto state 4
+    BinData        shift, and goto state 19
     DBRef          shift, and goto state 18
     ISODate        shift, and goto state 12
     Literal        shift, and goto state 8
@@ -43,21 +44,21 @@ state 3 // '[' [',']
     1 array: '[' elements . ']'
    10 elements: elements . ',' value
 
-    ','  shift, and goto state 64
-    ']'  shift, and goto state 63
+    ','  shift, and goto state 70
+    ']'  shift, and goto state 69
 
 state 4 // '[' '{'
 
     2 object: '{' . members '}'
     3 members: .  [',', '}']
 
-    '"'     shift, and goto state 53
+    '"'     shift, and goto state 59
     ','     reduce using rule 3 (members)
     '}'     reduce using rule 3 (members)
-    String  shift, and goto state 52
+    String  shift, and goto state 58
 
-    members  goto state 50
-    pair     goto state 51
+    members  goto state 56
+    pair     goto state 57
 
 state 5 // '[' Literal [',']
 
@@ -78,7 +79,7 @@ state 7 // '[' '"'
 
    12 value: '"' . String '"'
 
-    String  shift, and goto state 48
+    String  shift, and goto state 54
 
 state 8 // '[' Literal
 
@@ -108,25 +109,25 @@ state 11 // '[' ObjectID
 
    16 value: ObjectID . '(' '"' String '"' ')'
 
-    '('  shift, and goto state 43
+    '('  shift, and goto state 49
 
 state 12 // '[' ISODate
 
    17 value: ISODate . '(' '"' String '"' ')'
 
-    '('  shift, and goto state 38
+    '('  shift, and goto state 44
 
 state 13 // '[' NumberLong
 
    18 value: NumberLong . '(' '"' String '"' ')'
 
-    '('  shift, and goto state 33
+    '('  shift, and goto state 39
 
 state 14 // '[' NumberDecimal
 
    19 value: NumberDecimal . '(' '"' String '"' ')'
 
-    '('  shift, and goto state 28
+    '('  shift, and goto state 34
 
 state 15 // '[' Undefined
 
@@ -156,57 +157,95 @@ state 18 // '[' DBRef
 
    23 value: DBRef . '(' '"' String '"' ',' '"' String '"' ')'
 
-    '('  shift, and goto state 19
+    '('  shift, and goto state 25
 
-state 19 // '[' DBRef '('
+state 19 // '[' BinData
 
-   23 value: DBRef '(' . '"' String '"' ',' '"' String '"' ')'
+   24 value: BinData . '(' String ',' String ')'
 
-    '"'  shift, and goto state 20
+    '('  shift, and goto state 20
 
-state 20 // '[' DBRef '(' '"'
+state 20 // '[' BinData '('
 
-   23 value: DBRef '(' '"' . String '"' ',' '"' String '"' ')'
+   24 value: BinData '(' . String ',' String ')'
 
     String  shift, and goto state 21
 
-state 21 // '[' DBRef '(' '"' String
+state 21 // '[' BinData '(' String
 
-   23 value: DBRef '(' '"' String . '"' ',' '"' String '"' ')'
+   24 value: BinData '(' String . ',' String ')'
 
-    '"'  shift, and goto state 22
+    ','  shift, and goto state 22
 
-state 22 // '[' DBRef '(' '"' String '"'
+state 22 // '[' BinData '(' String ','
 
-   23 value: DBRef '(' '"' String '"' . ',' '"' String '"' ')'
+   24 value: BinData '(' String ',' . String ')'
 
-    ','  shift, and goto state 23
+    String  shift, and goto state 23
 
-state 23 // '[' DBRef '(' '"' String '"' ','
+state 23 // '[' BinData '(' String ',' String
 
-   23 value: DBRef '(' '"' String '"' ',' . '"' String '"' ')'
+   24 value: BinData '(' String ',' String . ')'
 
-    '"'  shift, and goto state 24
+    ')'  shift, and goto state 24
 
-state 24 // '[' DBRef '(' '"' String '"' ',' '"'
+state 24 // '[' BinData '(' String ',' String ')'
 
-   23 value: DBRef '(' '"' String '"' ',' '"' . String '"' ')'
+   24 value: BinData '(' String ',' String ')' .  [',', ']', '}']
 
-    String  shift, and goto state 25
+    ','  reduce using rule 24 (value)
+    ']'  reduce using rule 24 (value)
+    '}'  reduce using rule 24 (value)
 
-state 25 // '[' DBRef '(' '"' String '"' ',' '"' String
+state 25 // '[' DBRef '('
 
-   23 value: DBRef '(' '"' String '"' ',' '"' String . '"' ')'
+   23 value: DBRef '(' . '"' String '"' ',' '"' String '"' ')'
 
     '"'  shift, and goto state 26
 
-state 26 // '[' DBRef '(' '"' String '"' ',' '"' String '"'
+state 26 // '[' DBRef '(' '"'
+
+   23 value: DBRef '(' '"' . String '"' ',' '"' String '"' ')'
+
+    String  shift, and goto state 27
+
+state 27 // '[' DBRef '(' '"' String
+
+   23 value: DBRef '(' '"' String . '"' ',' '"' String '"' ')'
+
+    '"'  shift, and goto state 28
+
+state 28 // '[' DBRef '(' '"' String '"'
+
+   23 value: DBRef '(' '"' String '"' . ',' '"' String '"' ')'
+
+    ','  shift, and goto state 29
+
+state 29 // '[' DBRef '(' '"' String '"' ','
+
+   23 value: DBRef '(' '"' String '"' ',' . '"' String '"' ')'
+
+    '"'  shift, and goto state 30
+
+state 30 // '[' DBRef '(' '"' String '"' ',' '"'
+
+   23 value: DBRef '(' '"' String '"' ',' '"' . String '"' ')'
+
+    String  shift, and goto state 31
+
+state 31 // '[' DBRef '(' '"' String '"' ',' '"' String
+
+   23 value: DBRef '(' '"' String '"' ',' '"' String . '"' ')'
+
+    '"'  shift, and goto state 32
+
+state 32 // '[' DBRef '(' '"' String '"' ',' '"' String '"'
 
    23 value: DBRef '(' '"' String '"' ',' '"' String '"' . ')'
 
-    ')'  shift, and goto state 27
+    ')'  shift, and goto state 33
 
-state 27 // '[' DBRef '(' '"' String '"' ',' '"' String '"' ')'
+state 33 // '[' DBRef '(' '"' String '"' ',' '"' String '"' ')'
 
    23 value: DBRef '(' '"' String '"' ',' '"' String '"' ')' .  [',', ']', '}']
 
@@ -214,31 +253,31 @@ state 27 // '[' DBRef '(' '"' String '"' ',' '"' String '"' ')'
     ']'  reduce using rule 23 (value)
     '}'  reduce using rule 23 (value)
 
-state 28 // '[' NumberDecimal '('
+state 34 // '[' NumberDecimal '('
 
    19 value: NumberDecimal '(' . '"' String '"' ')'
 
-    '"'  shift, and goto state 29
+    '"'  shift, and goto state 35
 
-state 29 // '[' NumberDecimal '(' '"'
+state 35 // '[' NumberDecimal '(' '"'
 
    19 value: NumberDecimal '(' '"' . String '"' ')'
 
-    String  shift, and goto state 30
+    String  shift, and goto state 36
 
-state 30 // '[' NumberDecimal '(' '"' String
+state 36 // '[' NumberDecimal '(' '"' String
 
    19 value: NumberDecimal '(' '"' String . '"' ')'
 
-    '"'  shift, and goto state 31
+    '"'  shift, and goto state 37
 
-state 31 // '[' NumberDecimal '(' '"' String '"'
+state 37 // '[' NumberDecimal '(' '"' String '"'
 
    19 value: NumberDecimal '(' '"' String '"' . ')'
 
-    ')'  shift, and goto state 32
+    ')'  shift, and goto state 38
 
-state 32 // '[' NumberDecimal '(' '"' String '"' ')'
+state 38 // '[' NumberDecimal '(' '"' String '"' ')'
 
    19 value: NumberDecimal '(' '"' String '"' ')' .  [',', ']', '}']
 
@@ -246,31 +285,31 @@ state 32 // '[' NumberDecimal '(' '"' String '"' ')'
     ']'  reduce using rule 19 (value)
     '}'  reduce using rule 19 (value)
 
-state 33 // '[' NumberLong '('
+state 39 // '[' NumberLong '('
 
    18 value: NumberLong '(' . '"' String '"' ')'
 
-    '"'  shift, and goto state 34
+    '"'  shift, and goto state 40
 
-state 34 // '[' NumberLong '(' '"'
+state 40 // '[' NumberLong '(' '"'
 
    18 value: NumberLong '(' '"' . String '"' ')'
 
-    String  shift, and goto state 35
+    String  shift, and goto state 41
 
-state 35 // '[' NumberLong '(' '"' String
+state 41 // '[' NumberLong '(' '"' String
 
    18 value: NumberLong '(' '"' String . '"' ')'
 
-    '"'  shift, and goto state 36
+    '"'  shift, and goto state 42
 
-state 36 // '[' NumberLong '(' '"' String '"'
+state 42 // '[' NumberLong '(' '"' String '"'
 
    18 value: NumberLong '(' '"' String '"' . ')'
 
-    ')'  shift, and goto state 37
+    ')'  shift, and goto state 43
 
-state 37 // '[' NumberLong '(' '"' String '"' ')'
+state 43 // '[' NumberLong '(' '"' String '"' ')'
 
    18 value: NumberLong '(' '"' String '"' ')' .  [',', ']', '}']
 
@@ -278,31 +317,31 @@ state 37 // '[' NumberLong '(' '"' String '"' ')'
     ']'  reduce using rule 18 (value)
     '}'  reduce using rule 18 (value)
 
-state 38 // '[' ISODate '('
+state 44 // '[' ISODate '('
 
    17 value: ISODate '(' . '"' String '"' ')'
 
-    '"'  shift, and goto state 39
+    '"'  shift, and goto state 45
 
-state 39 // '[' ISODate '(' '"'
+state 45 // '[' ISODate '(' '"'
 
    17 value: ISODate '(' '"' . String '"' ')'
 
-    String  shift, and goto state 40
+    String  shift, and goto state 46
 
-state 40 // '[' ISODate '(' '"' String
+state 46 // '[' ISODate '(' '"' String
 
    17 value: ISODate '(' '"' String . '"' ')'
 
-    '"'  shift, and goto state 41
+    '"'  shift, and goto state 47
 
-state 41 // '[' ISODate '(' '"' String '"'
+state 47 // '[' ISODate '(' '"' String '"'
 
    17 value: ISODate '(' '"' String '"' . ')'
 
-    ')'  shift, and goto state 42
+    ')'  shift, and goto state 48
 
-state 42 // '[' ISODate '(' '"' String '"' ')'
+state 48 // '[' ISODate '(' '"' String '"' ')'
 
    17 value: ISODate '(' '"' String '"' ')' .  [',', ']', '}']
 
@@ -310,31 +349,31 @@ state 42 // '[' ISODate '(' '"' String '"' ')'
     ']'  reduce using rule 17 (value)
     '}'  reduce using rule 17 (value)
 
-state 43 // '[' ObjectID '('
+state 49 // '[' ObjectID '('
 
    16 value: ObjectID '(' . '"' String '"' ')'
 
-    '"'  shift, and goto state 44
+    '"'  shift, and goto state 50
 
-state 44 // '[' ObjectID '(' '"'
+state 50 // '[' ObjectID '(' '"'
 
    16 value: ObjectID '(' '"' . String '"' ')'
 
-    String  shift, and goto state 45
+    String  shift, and goto state 51
 
-state 45 // '[' ObjectID '(' '"' String
+state 51 // '[' ObjectID '(' '"' String
 
    16 value: ObjectID '(' '"' String . '"' ')'
 
-    '"'  shift, and goto state 46
+    '"'  shift, and goto state 52
 
-state 46 // '[' ObjectID '(' '"' String '"'
+state 52 // '[' ObjectID '(' '"' String '"'
 
    16 value: ObjectID '(' '"' String '"' . ')'
 
-    ')'  shift, and goto state 47
+    ')'  shift, and goto state 53
 
-state 47 // '[' ObjectID '(' '"' String '"' ')'
+state 53 // '[' ObjectID '(' '"' String '"' ')'
 
    16 value: ObjectID '(' '"' String '"' ')' .  [',', ']', '}']
 
@@ -342,13 +381,13 @@ state 47 // '[' ObjectID '(' '"' String '"' ')'
     ']'  reduce using rule 16 (value)
     '}'  reduce using rule 16 (value)
 
-state 48 // '[' '"' String
+state 54 // '[' '"' String
 
    12 value: '"' String . '"'
 
-    '"'  shift, and goto state 49
+    '"'  shift, and goto state 55
 
-state 49 // '[' '"' String '"'
+state 55 // '[' '"' String '"'
 
    12 value: '"' String '"' .  [',', ']', '}']
 
@@ -356,52 +395,53 @@ state 49 // '[' '"' String '"'
     ']'  reduce using rule 12 (value)
     '}'  reduce using rule 12 (value)
 
-state 50 // '[' '{' [',']
+state 56 // '[' '{' [',']
 
     2 object: '{' members . '}'
     5 members: members . ',' pair
 
-    ','  shift, and goto state 61
-    '}'  shift, and goto state 60
+    ','  shift, and goto state 67
+    '}'  shift, and goto state 66
 
-state 51 // '[' '{' String ':' Literal [',']
+state 57 // '[' '{' String ':' Literal [',']
 
     4 members: pair .  [',', '}']
 
     ','  reduce using rule 4 (members)
     '}'  reduce using rule 4 (members)
 
-state 52 // '[' '{' String
+state 58 // '[' '{' String
 
     6 pair: String . ':' value
 
-    ':'  shift, and goto state 58
+    ':'  shift, and goto state 64
 
-state 53 // '[' '{' '"'
+state 59 // '[' '{' '"'
 
     7 pair: '"' . String '"' ':' value
 
-    String  shift, and goto state 54
+    String  shift, and goto state 60
 
-state 54 // '[' '{' '"' String
+state 60 // '[' '{' '"' String
 
     7 pair: '"' String . '"' ':' value
 
-    '"'  shift, and goto state 55
+    '"'  shift, and goto state 61
 
-state 55 // '[' '{' '"' String '"'
+state 61 // '[' '{' '"' String '"'
 
     7 pair: '"' String '"' . ':' value
 
-    ':'  shift, and goto state 56
+    ':'  shift, and goto state 62
 
-state 56 // '[' '{' '"' String '"' ':'
+state 62 // '[' '{' '"' String '"' ':'
 
     7 pair: '"' String '"' ':' . value
 
     '"'            shift, and goto state 7
     '['            shift, and goto state 2
     '{'            shift, and goto state 4
+    BinData        shift, and goto state 19
     DBRef          shift, and goto state 18
     ISODate        shift, and goto state 12
     Literal        shift, and goto state 8
@@ -415,84 +455,23 @@ state 56 // '[' '{' '"' String '"' ':'
 
     array   goto state 10
     object  goto state 9
-    value   goto state 57
+    value   goto state 63
 
-state 57 // '[' '{' '"' String '"' ':' Literal [',']
+state 63 // '[' '{' '"' String '"' ':' Literal [',']
 
     7 pair: '"' String '"' ':' value .  [',', '}']
 
     ','  reduce using rule 7 (pair)
     '}'  reduce using rule 7 (pair)
 
-state 58 // '[' '{' String ':'
+state 64 // '[' '{' String ':'
 
     6 pair: String ':' . value
 
     '"'            shift, and goto state 7
     '['            shift, and goto state 2
     '{'            shift, and goto state 4
-    DBRef          shift, and goto state 18
-    ISODate        shift, and goto state 12
-    Literal        shift, and goto state 8
-    MaxKey         shift, and goto state 17
-    MinKey         shift, and goto state 16
-    Number         shift, and goto state 6
-    NumberDecimal  shift, and goto state 14
-    NumberLong     shift, and goto state 13
-    ObjectID       shift, and goto state 11
-    Undefined      shift, and goto state 15
-
-    array   goto state 10
-    object  goto state 9
-    value   goto state 59
-
-state 59 // '[' '{' String ':' Literal [',']
-
-    6 pair: String ':' value .  [',', '}']
-
-    ','  reduce using rule 6 (pair)
-    '}'  reduce using rule 6 (pair)
-
-state 60 // '[' '{' '}'
-
-    2 object: '{' members '}' .  [',', ']', '}']
-
-    ','  reduce using rule 2 (object)
-    ']'  reduce using rule 2 (object)
-    '}'  reduce using rule 2 (object)
-
-state 61 // '[' '{' ','
-
-    5 members: members ',' . pair
-
-    '"'     shift, and goto state 53
-    String  shift, and goto state 52
-
-    pair  goto state 62
-
-state 62 // '[' '{' ',' String ':' Literal [',']
-
-    5 members: members ',' pair .  [',', '}']
-
-    ','  reduce using rule 5 (members)
-    '}'  reduce using rule 5 (members)
-
-state 63 // '[' ']'
-
-    1 array: '[' elements ']' .  [$end, ',', ']', '}']
-
-    $end  reduce using rule 1 (array)
-    ','   reduce using rule 1 (array)
-    ']'   reduce using rule 1 (array)
-    '}'   reduce using rule 1 (array)
-
-state 64 // '[' ','
-
-   10 elements: elements ',' . value
-
-    '"'            shift, and goto state 7
-    '['            shift, and goto state 2
-    '{'            shift, and goto state 4
+    BinData        shift, and goto state 19
     DBRef          shift, and goto state 18
     ISODate        shift, and goto state 12
     Literal        shift, and goto state 8
@@ -508,7 +487,70 @@ state 64 // '[' ','
     object  goto state 9
     value   goto state 65
 
-state 65 // '[' ',' Literal [',']
+state 65 // '[' '{' String ':' Literal [',']
+
+    6 pair: String ':' value .  [',', '}']
+
+    ','  reduce using rule 6 (pair)
+    '}'  reduce using rule 6 (pair)
+
+state 66 // '[' '{' '}'
+
+    2 object: '{' members '}' .  [',', ']', '}']
+
+    ','  reduce using rule 2 (object)
+    ']'  reduce using rule 2 (object)
+    '}'  reduce using rule 2 (object)
+
+state 67 // '[' '{' ','
+
+    5 members: members ',' . pair
+
+    '"'     shift, and goto state 59
+    String  shift, and goto state 58
+
+    pair  goto state 68
+
+state 68 // '[' '{' ',' String ':' Literal [',']
+
+    5 members: members ',' pair .  [',', '}']
+
+    ','  reduce using rule 5 (members)
+    '}'  reduce using rule 5 (members)
+
+state 69 // '[' ']'
+
+    1 array: '[' elements ']' .  [$end, ',', ']', '}']
+
+    $end  reduce using rule 1 (array)
+    ','   reduce using rule 1 (array)
+    ']'   reduce using rule 1 (array)
+    '}'   reduce using rule 1 (array)
+
+state 70 // '[' ','
+
+   10 elements: elements ',' . value
+
+    '"'            shift, and goto state 7
+    '['            shift, and goto state 2
+    '{'            shift, and goto state 4
+    BinData        shift, and goto state 19
+    DBRef          shift, and goto state 18
+    ISODate        shift, and goto state 12
+    Literal        shift, and goto state 8
+    MaxKey         shift, and goto state 17
+    MinKey         shift, and goto state 16
+    Number         shift, and goto state 6
+    NumberDecimal  shift, and goto state 14
+    NumberLong     shift, and goto state 13
+    ObjectID       shift, and goto state 11
+    Undefined      shift, and goto state 15
+
+    array   goto state 10
+    object  goto state 9
+    value   goto state 71
+
+state 71 // '[' ',' Literal [',']
 
    10 elements: elements ',' value .  [',', ']']
 
