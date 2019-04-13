@@ -29,9 +29,9 @@ func TestParser(t *testing.T) {
 			"a": "hello\n",
 		},
 	}, {
-		input: `{_id: "555"}`,
+		input: `{_id: "<,\"555"}`,
 		output: map[string]interface{}{
-			"_id": "555",
+			"_id": "<,\"555",
 		},
 	}, {
 		input: `{"a": 1, "_id": ObjectId("5c99f90cf1c077b8fbb76089")}`,
@@ -79,6 +79,11 @@ func TestParser(t *testing.T) {
 		input: `{"a": []}`,
 		output: map[string]interface{}{
 			"a": []interface{}{},
+		},
+	}, {
+		input: `{"a": [1,2,3]}`,
+		output: map[string]interface{}{
+			"a": []interface{}{float64(1), float64(2), float64(3)},
 		},
 	}, {
 		input: `{"a": [1.2]}`,
