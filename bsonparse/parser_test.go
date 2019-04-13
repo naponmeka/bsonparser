@@ -52,6 +52,12 @@ func TestParser(t *testing.T) {
 			"image": map[string]interface{}{"$binary": "xxx", "$type": "jpg"},
 		},
 	}, {
+		input: `{"a": 1, "test": /<Regex>/<Options>}`,
+		output: map[string]interface{}{
+			"a":    float64(1),
+			"test": map[string]interface{}{"$regex": "<Regex>", "$options": "<Options>"},
+		},
+	}, {
 		input: `{"a": 1, "age": undefined}`,
 		output: map[string]interface{}{
 			"a":   float64(1),

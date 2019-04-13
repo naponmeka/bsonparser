@@ -45,14 +45,15 @@ func isSpecialChar(b byte) bool {
 	return b == '[' || b == ']' ||
 		b == '{' || b == '}' ||
 		b == '(' || b == ')' ||
-		b == ':' || b == 0 || b == ',' || b == '"'
+		b == ':' || b == 0 || b == ',' || b == '/' ||
+		b == '"'
 }
 
 func isSpecialCharNoQuote(b byte) bool {
 	return b == '[' || b == ']' ||
 		b == '{' || b == '}' ||
 		b == '(' || b == ')' ||
-		b == ':' || b == 0 || b == ','
+		b == ':' || b == 0 || b == ',' || b == '/'
 }
 
 func (l *lex) scanNormal(lval *yySymType) int {

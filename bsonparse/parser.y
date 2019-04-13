@@ -130,3 +130,7 @@ Number
   {
     $$ = map[string]interface{}{"$binary": $5, "$type": $3}
   }
+| '/' String '/' String
+  {
+    $$ = map[string]interface{}{"$regex": $2, "$options": $4}
+  }
