@@ -44,9 +44,9 @@ func (l *lex) scanNormal(lval *yySymType) int {
 		switch {
 		case unicode.IsSpace(rune(b)):
 			continue
-		case b == '"':
-			continue
-			// return l.scanString(lval)
+		// case b == '"':
+		// 	continue
+		// return l.scanString(lval)
 		case unicode.IsDigit(rune(b)) || b == '+' || b == '-':
 			l.backup()
 			return l.scanNum(lval)

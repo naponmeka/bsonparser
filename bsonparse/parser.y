@@ -59,9 +59,14 @@ members:
     $$ = $1
   }
 
-pair: String ':' value
+pair:
+String ':' value
   {
     $$ = pair{key: $1.(string), val: $3}
+  }
+| '"' String '"' ':' value
+  {
+    $$ = pair{key: $2.(string), val: $5}
   }
 
 elements:
@@ -78,8 +83,11 @@ elements:
   }
 
 value:
-  String
-| Number
+Number
+| '"' String '"'
+  {
+    $$ = $2
+  }
 | Literal
 | object
   {
