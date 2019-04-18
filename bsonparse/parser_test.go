@@ -19,6 +19,21 @@ func TestParser(t *testing.T) {
 			"a": float64(1),
 		},
 	}, {
+		input: `{a: 1}`,
+		output: map[string]interface{}{
+			"a": float64(1),
+		},
+	}, {
+		input: `{a: "hello\n"}`,
+		output: map[string]interface{}{
+			"a": "hello\n",
+		},
+	}, {
+		input: `{_id: "<,\"555"}`,
+		output: map[string]interface{}{
+			"_id": "<,\"555",
+		},
+	}, {
 		input: `{"a": 1, "_id": ObjectId("5c99f90cf1c077b8fbb76089")}`,
 		output: map[string]interface{}{
 			"a":   float64(1),
@@ -29,6 +44,18 @@ func TestParser(t *testing.T) {
 		output: map[string]interface{}{
 			"a":    float64(1),
 			"date": map[string]interface{}{"$date": "xxxx"},
+		},
+	}, {
+		input: `{"a": 1, "image": BinData(jpg, xxx)}`,
+		output: map[string]interface{}{
+			"a":     float64(1),
+			"image": map[string]interface{}{"$binary": "xxx", "$type": "jpg"},
+		},
+	}, {
+		input: `{"a": 1, "test": /<Regex>/<Options>}`,
+		output: map[string]interface{}{
+			"a":    float64(1),
+			"test": map[string]interface{}{"$regex": "<Regex>", "$options": "<Options>"},
 		},
 	}, {
 		input: `{"a": 1, "age": undefined}`,
@@ -49,10 +76,10 @@ func TestParser(t *testing.T) {
 			"age": map[string]interface{}{"$maxKey": true},
 		},
 	}, {
-		input: `{"a": 1, "age": DBRef("<name>", "<id>")}`,
+		input: `{"a": 1, "age": DBRef("name", "id")}`,
 		output: map[string]interface{}{
 			"a":   float64(1),
-			"age": map[string]interface{}{"$ref": "<name>", "$id": "<id>"},
+			"age": map[string]interface{}{"$ref": "name", "$id": "id"},
 		},
 	}, {
 		input: `{"a": 1, "b": ["c", 2]}`,
@@ -64,6 +91,19 @@ func TestParser(t *testing.T) {
 		input: `{"a": []}`,
 		output: map[string]interface{}{
 			"a": []interface{}{},
+		},
+	}, {
+		input: `{"a": [1,2,3]}`,
+		output: map[string]interface{}{
+			"a": []interface{}{float64(1), float64(2), float64(3)},
+		},
+	}, {
+		input: `{"a": [1,
+		2,
+		3
+		]}`,
+		output: map[string]interface{}{
+			"a": []interface{}{float64(1), float64(2), float64(3)},
 		},
 	}, {
 		input: `{"a": [1.2]}`,

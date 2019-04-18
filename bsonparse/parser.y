@@ -20,7 +20,7 @@ func setResult(l yyLexer, v []interface{}) {
 
 %token LexError
 %token BsonError
-%token <val> String Number Literal ObjectID ISODate NumberLong NumberDecimal Undefined MinKey MaxKey DBRef
+%token <val> String Number Literal ObjectID ISODate NumberLong NumberDecimal Undefined MinKey MaxKey DBRef BinData
 
 %type <obj> object members
 %type <pair> pair
@@ -59,9 +59,14 @@ members:
     $$ = $1
   }
 
-pair: String ':' value
+pair:
+String ':' value
   {
     $$ = pair{key: $1.(string), val: $3}
+  }
+| '"' String '"' ':' value
+  {
+    $$ = pair{key: $2.(string), val: $5}
   }
 
 elements:
@@ -78,29 +83,32 @@ elements:
   }
 
 value:
-  String
-| Number
+Number
+| '"' String '"'
+  {
+    $$ = $2
+  }
 | Literal
 | object
   {
     $$ = $1
   }
 | array
-| ObjectID ')'
+| ObjectID '(' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$oid": $1}
+    $$ = map[string]interface{}{"$oid": $4}
   }
-| ISODate ')'
+| ISODate '(' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$date": $1}
+    $$ = map[string]interface{}{"$date": $4}
   }
-| NumberLong ')'
+| NumberLong '(' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$numberLong": $1}
+    $$ = map[string]interface{}{"$numberLong": $4}
   }
-| NumberDecimal ')'
+| NumberDecimal '(' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$numberDecimal": $1}
+    $$ = map[string]interface{}{"$numberDecimal": $4}
   }
 | Undefined
   {
@@ -114,7 +122,15 @@ value:
   {
     $$ = map[string]interface{}{"$maxKey": true}
   }
-| DBRef ',' String')'
+| DBRef '(' '"' String '"' ',' '"' String '"' ')'
   {
-    $$ = map[string]interface{}{"$ref": $1, "$id": $3}
+    $$ = map[string]interface{}{"$ref": $4, "$id": $8}
+  }
+| BinData '(' String ',' String ')'
+  {
+    $$ = map[string]interface{}{"$binary": $5, "$type": $3}
+  }
+| '/' String '/' String
+  {
+    $$ = map[string]interface{}{"$regex": $2, "$options": $4}
   }

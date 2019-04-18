@@ -26,8 +26,9 @@ type yyXError struct {
 }
 
 const (
-	yyDefault     = 57359
+	yyDefault     = 57360
 	yyEofCode     = 57344
+	BinData       = 57359
 	BsonError     = 57347
 	DBRef         = 57358
 	ISODate       = 57352
@@ -44,53 +45,61 @@ const (
 	yyErrCode     = 57345
 
 	yyMaxDepth = 200
-	yyTabOfs   = -23
+	yyTabOfs   = -26
 )
 
 var (
 	yyPrec = map[int]int{}
 
 	yyXLAT = map[int]int{
-		44:    0,  // ',' (25x)
-		125:   1,  // '}' (20x)
-		93:    2,  // ']' (19x)
-		57348: 3,  // String (6x)
-		41:    4,  // ')' (5x)
-		91:    5,  // '[' (4x)
-		57360: 6,  // array (4x)
-		123:   7,  // '{' (3x)
-		57358: 8,  // DBRef (3x)
-		57352: 9,  // ISODate (3x)
-		57350: 10, // Literal (3x)
-		57357: 11, // MaxKey (3x)
-		57356: 12, // MinKey (3x)
-		57349: 13, // Number (3x)
-		57354: 14, // NumberDecimal (3x)
-		57353: 15, // NumberLong (3x)
-		57363: 16, // object (3x)
-		57351: 17, // ObjectID (3x)
-		57355: 18, // Undefined (3x)
-		57365: 19, // value (3x)
-		57344: 20, // $end (2x)
-		57364: 21, // pair (2x)
-		58:    22, // ':' (1x)
-		57361: 23, // elements (1x)
-		57362: 24, // members (1x)
-		57359: 25, // $default (0x)
-		57347: 26, // BsonError (0x)
-		57345: 27, // error (0x)
-		57346: 28, // LexError (0x)
+		44:    0,  // ',' (29x)
+		125:   1,  // '}' (23x)
+		93:    2,  // ']' (21x)
+		34:    3,  // '"' (20x)
+		57348: 4,  // String (14x)
+		40:    5,  // '(' (6x)
+		41:    6,  // ')' (6x)
+		47:    7,  // '/' (5x)
+		91:    8,  // '[' (5x)
+		57361: 9,  // array (5x)
+		123:   10, // '{' (4x)
+		57359: 11, // BinData (4x)
+		57358: 12, // DBRef (4x)
+		57352: 13, // ISODate (4x)
+		57350: 14, // Literal (4x)
+		57357: 15, // MaxKey (4x)
+		57356: 16, // MinKey (4x)
+		57349: 17, // Number (4x)
+		57354: 18, // NumberDecimal (4x)
+		57353: 19, // NumberLong (4x)
+		57364: 20, // object (4x)
+		57351: 21, // ObjectID (4x)
+		57355: 22, // Undefined (4x)
+		57366: 23, // value (4x)
+		57344: 24, // $end (2x)
+		58:    25, // ':' (2x)
+		57365: 26, // pair (2x)
+		57362: 27, // elements (1x)
+		57363: 28, // members (1x)
+		57360: 29, // $default (0x)
+		57347: 30, // BsonError (0x)
+		57345: 31, // error (0x)
+		57346: 32, // LexError (0x)
 	}
 
 	yySymNames = []string{
 		"','",
 		"'}'",
 		"']'",
+		"'\"'",
 		"String",
+		"'('",
 		"')'",
+		"'/'",
 		"'['",
 		"array",
 		"'{'",
+		"BinData",
 		"DBRef",
 		"ISODate",
 		"Literal",
@@ -104,8 +113,8 @@ var (
 		"Undefined",
 		"value",
 		"$end",
-		"pair",
 		"':'",
+		"pair",
 		"elements",
 		"members",
 		"$default",
@@ -118,78 +127,128 @@ var (
 
 	yyReductions = map[int]struct{ xsym, components int }{
 		0:  {0, 1},
-		1:  {6, 3},
-		2:  {16, 3},
-		3:  {24, 0},
-		4:  {24, 1},
-		5:  {24, 3},
-		6:  {21, 3},
-		7:  {23, 0},
-		8:  {23, 1},
-		9:  {23, 3},
-		10: {19, 1},
-		11: {19, 1},
-		12: {19, 1},
-		13: {19, 1},
-		14: {19, 1},
-		15: {19, 2},
-		16: {19, 2},
-		17: {19, 2},
-		18: {19, 2},
-		19: {19, 1},
-		20: {19, 1},
-		21: {19, 1},
-		22: {19, 4},
+		1:  {9, 3},
+		2:  {20, 3},
+		3:  {28, 0},
+		4:  {28, 1},
+		5:  {28, 3},
+		6:  {26, 3},
+		7:  {26, 5},
+		8:  {27, 0},
+		9:  {27, 1},
+		10: {27, 3},
+		11: {23, 1},
+		12: {23, 3},
+		13: {23, 1},
+		14: {23, 1},
+		15: {23, 1},
+		16: {23, 6},
+		17: {23, 6},
+		18: {23, 6},
+		19: {23, 6},
+		20: {23, 1},
+		21: {23, 1},
+		22: {23, 1},
+		23: {23, 10},
+		24: {23, 6},
+		25: {23, 4},
 	}
 
 	yyXErrors = map[yyXError]string{}
 
-	yyParseTab = [37][]uint8{
+	yyParseTab = [76][]uint8{
 		// 0
-		{5: 25, 24},
-		{20: 23},
-		{16, 2: 16, 29, 5: 25, 33, 27, 41, 35, 31, 40, 39, 30, 37, 36, 32, 34, 38, 28, 23: 26},
-		{58, 2: 57},
-		{20, 20, 3: 51, 21: 50, 24: 49},
+		{8: 28, 27},
+		{24: 26},
+		{18, 2: 18, 33, 7: 46, 28, 36, 30, 45, 44, 38, 34, 43, 42, 32, 40, 39, 35, 37, 41, 31, 27: 29},
+		{100, 2: 99},
+		{23, 23, 3: 89, 88, 26: 87, 28: 86},
 		// 5
-		{15, 2: 15},
+		{17, 2: 17},
+		{15, 15, 15},
+		{4: 84},
 		{13, 13, 13},
 		{12, 12, 12},
-		{11, 11, 11},
-		{10, 10, 10},
 		// 10
-		{9, 9, 9},
-		{4: 48},
-		{4: 47},
-		{4: 46},
-		{4: 45},
+		{11, 11, 11},
+		{5: 79},
+		{5: 74},
+		{5: 69},
+		{5: 64},
 		// 15
-		{4, 4, 4},
-		{3, 3, 3},
-		{2, 2, 2},
-		{42},
-		{3: 43},
-		// 20
-		{4: 44},
-		{1, 1, 1},
-		{5, 5, 5},
 		{6, 6, 6},
-		{7, 7, 7},
+		{5, 5, 5},
+		{4, 4, 4},
+		{5: 55},
+		{5: 50},
+		// 20
+		{4: 47},
+		{7: 48},
+		{4: 49},
+		{1, 1, 1},
+		{4: 51},
 		// 25
-		{8, 8, 8},
-		{55, 54},
-		{19, 19},
-		{22: 52},
-		{3: 29, 5: 25, 33, 27, 41, 35, 31, 40, 39, 30, 37, 36, 32, 34, 38, 53},
+		{52},
+		{4: 53},
+		{6: 54},
+		{2, 2, 2},
+		{3: 56},
 		// 30
-		{17, 17},
-		{21, 21, 21},
-		{3: 51, 21: 56},
-		{18, 18},
-		{22, 22, 22, 20: 22},
+		{4: 57},
+		{3: 58},
+		{59},
+		{3: 60},
+		{4: 61},
 		// 35
-		{3: 29, 5: 25, 33, 27, 41, 35, 31, 40, 39, 30, 37, 36, 32, 34, 38, 59},
-		{14, 2: 14},
+		{3: 62},
+		{6: 63},
+		{3, 3, 3},
+		{3: 65},
+		{4: 66},
+		// 40
+		{3: 67},
+		{6: 68},
+		{7, 7, 7},
+		{3: 70},
+		{4: 71},
+		// 45
+		{3: 72},
+		{6: 73},
+		{8, 8, 8},
+		{3: 75},
+		{4: 76},
+		// 50
+		{3: 77},
+		{6: 78},
+		{9, 9, 9},
+		{3: 80},
+		{4: 81},
+		// 55
+		{3: 82},
+		{6: 83},
+		{10, 10, 10},
+		{3: 85},
+		{14, 14, 14},
+		// 60
+		{97, 96},
+		{22, 22},
+		{25: 94},
+		{4: 90},
+		{3: 91},
+		// 65
+		{25: 92},
+		{3: 33, 7: 46, 28, 36, 30, 45, 44, 38, 34, 43, 42, 32, 40, 39, 35, 37, 41, 93},
+		{19, 19},
+		{3: 33, 7: 46, 28, 36, 30, 45, 44, 38, 34, 43, 42, 32, 40, 39, 35, 37, 41, 95},
+		{20, 20},
+		// 70
+		{24, 24, 24},
+		{3: 89, 88, 26: 98},
+		{21, 21},
+		{25, 25, 25, 24: 25},
+		{3: 33, 7: 46, 28, 36, 30, 45, 44, 38, 34, 43, 42, 32, 40, 39, 35, 37, 41, 101},
+		// 75
+		{16, 2: 16},
 	}
 )
 
@@ -230,7 +289,7 @@ func yylex1(yylex yyLexer, lval *yySymType) (n int) {
 }
 
 func yyParse(yylex yyLexer) int {
-	const yyError = 27
+	const yyError = 31
 
 	yyEx, _ := yylex.(yyLexerEx)
 	var yyn int
@@ -448,51 +507,67 @@ yynewstate:
 		}
 	case 7:
 		{
-			yyVAL.list = []interface{}{}
+			yyVAL.pair = pair{key: yyS[yypt-3].val.(string), val: yyS[yypt-0].val}
 		}
 	case 8:
 		{
-			yyVAL.list = []interface{}{yyS[yypt-0].val}
+			yyVAL.list = []interface{}{}
 		}
 	case 9:
 		{
+			yyVAL.list = []interface{}{yyS[yypt-0].val}
+		}
+	case 10:
+		{
 			yyVAL.list = append(yyS[yypt-2].list, yyS[yypt-0].val)
 		}
-	case 13:
+	case 12:
+		{
+			yyVAL.val = yyS[yypt-1].val
+		}
+	case 14:
 		{
 			yyVAL.val = yyS[yypt-0].obj
 		}
-	case 15:
-		{
-			yyVAL.val = map[string]interface{}{"$oid": yyS[yypt-1].val}
-		}
 	case 16:
 		{
-			yyVAL.val = map[string]interface{}{"$date": yyS[yypt-1].val}
+			yyVAL.val = map[string]interface{}{"$oid": yyS[yypt-2].val}
 		}
 	case 17:
 		{
-			yyVAL.val = map[string]interface{}{"$numberLong": yyS[yypt-1].val}
+			yyVAL.val = map[string]interface{}{"$date": yyS[yypt-2].val}
 		}
 	case 18:
 		{
-			yyVAL.val = map[string]interface{}{"$numberDecimal": yyS[yypt-1].val}
+			yyVAL.val = map[string]interface{}{"$numberLong": yyS[yypt-2].val}
 		}
 	case 19:
 		{
-			yyVAL.val = map[string]interface{}{"$undefined": true}
+			yyVAL.val = map[string]interface{}{"$numberDecimal": yyS[yypt-2].val}
 		}
 	case 20:
 		{
-			yyVAL.val = map[string]interface{}{"$minKey": true}
+			yyVAL.val = map[string]interface{}{"$undefined": true}
 		}
 	case 21:
 		{
-			yyVAL.val = map[string]interface{}{"$maxKey": true}
+			yyVAL.val = map[string]interface{}{"$minKey": true}
 		}
 	case 22:
 		{
-			yyVAL.val = map[string]interface{}{"$ref": yyS[yypt-3].val, "$id": yyS[yypt-1].val}
+			yyVAL.val = map[string]interface{}{"$maxKey": true}
+		}
+	case 23:
+		{
+			yyVAL.val = map[string]interface{}{"$ref": yyS[yypt-6].val, "$id": yyS[yypt-2].val}
+		}
+	case 24:
+		{
+			yyVAL.val = map[string]interface{}{"$binary": yyS[yypt-1].val, "$type": yyS[yypt-3].val}
+		}
+	case 25:
+		{
+			yyVAL.val = map[string]interface{}{"$regex": yyS[yypt-2].val, "$options": yyS[yypt-0].val}
 		}
 
 	}

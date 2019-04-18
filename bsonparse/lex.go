@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"strconv"
-	"strings"
 	"unicode"
 )
 
@@ -35,26 +34,39 @@ func (l *lex) Lex(lval *yySymType) int {
 	return l.scanNormal(lval)
 }
 
+func isLetter(b byte) bool {
+	return unicode.IsLetter(rune(b)) ||
+		unicode.IsDigit(rune(b)) ||
+		b == '_' ||
+		b == '+' || b == '-'
+}
+
+func isSpecialChar(b byte) bool {
+	return b == '[' || b == ']' ||
+		b == '{' || b == '}' ||
+		b == '(' || b == ')' ||
+		b == ':' || b == 0 || b == ',' || b == '/' ||
+		b == '"'
+}
+
+func isSpecialCharNoQuote(b byte) bool {
+	return b == '[' || b == ']' ||
+		b == '{' || b == '}' ||
+		b == '(' || b == ')' ||
+		b == ':' || b == 0 || b == ',' || b == '/'
+}
+
 func (l *lex) scanNormal(lval *yySymType) int {
 	for b := l.next(); b != 0; b = l.next() {
 		switch {
 		case unicode.IsSpace(rune(b)):
 			continue
-		case b == '"':
-			return l.scanString(lval)
-		case unicode.IsDigit(rune(b)) || b == '+' || b == '-':
-			l.backup()
-			return l.scanNum(lval)
-		case unicode.IsLetter(rune(b)):
-			l.backup()
-			literal := l.scanLiteral(lval)
-			if literal == LexError {
-				l.backup()
-				return l.scanObj(lval)
-			}
-			return literal
-		default:
+		case isSpecialChar(b):
 			return int(b)
+		default:
+			l.backup()
+			result := l.scanAll(lval)
+			return result
 		}
 	}
 	return 0
@@ -71,115 +83,73 @@ var escape = map[byte]byte{
 	't':  '\t',
 }
 
-func (l *lex) scanString(lval *yySymType) int {
-	buf := bytes.NewBuffer(nil)
-	for b := l.next(); b != 0; b = l.next() {
-		switch b {
-		case '\\':
-			// TODO(sougou): handle \uxxxx construct.
-			b2 := escape[l.next()]
-			if b2 == 0 {
-				return LexError
-			}
-			buf.WriteByte(b2)
-		case '"':
-			lval.val = buf.String()
-			return String
-		default:
-			buf.WriteByte(b)
-		}
-	}
-	return LexError
-}
-
-func (l *lex) scanNum(lval *yySymType) int {
-	buf := bytes.NewBuffer(nil)
-	for {
-		b := l.next()
-		switch {
-		case unicode.IsDigit(rune(b)):
-			buf.WriteByte(b)
-		case strings.IndexByte(".+-eE", b) != -1:
-			buf.WriteByte(b)
-		default:
-			l.backup()
-			val, err := strconv.ParseFloat(buf.String(), 64)
-			if err != nil {
-				return LexError
-			}
-			lval.val = val
-			return Number
-		}
-	}
-}
-
 var literal = map[string]interface{}{
 	"true":  true,
 	"false": false,
 	"null":  nil,
 }
 
-func (l *lex) scanLiteral(lval *yySymType) int {
+func (l *lex) scanAll(lval *yySymType) int {
 	buf := bytes.NewBuffer(nil)
-	counter := 0
-	for {
-		b := l.next()
-		switch {
-		case unicode.IsLetter(rune(b)):
-			buf.WriteByte(b)
-		default:
+	l.backup()
+	first := l.next()
+	for b := l.next(); b != 0; b = l.next() {
+		if b == '\\' {
+			// TODO: handle \uxxxx construct.
+			b2 := escape[l.next()]
+			if b2 == 0 {
+				return LexError
+			}
+			buf.WriteByte(b2)
+		} else if b == 0 ||
+			(unicode.IsSpace(rune(first)) && isSpecialCharNoQuote(b)) ||
+			(isSpecialCharNoQuote(first) && isSpecialCharNoQuote(b)) ||
+			(first == '"' && b == '"') {
 			l.backup()
-			val, ok := literal[buf.String()]
+			currentStr := buf.String()
+			val, ok := literal[currentStr]
 			if !ok {
-				if buf.String() == "undefined" {
+				if currentStr == "undefined" {
 					return Undefined
-				} else if buf.String() == "MinKey" {
+				} else if currentStr == "MinKey" {
 					return MinKey
-				} else if buf.String() == "MaxKey" {
+				} else if currentStr == "MaxKey" {
 					return MaxKey
+				} else if currentStr == "ObjectId" && b == '(' {
+					return ObjectID
+				} else if currentStr == "ISODate" && b == '(' {
+					return ISODate
+				} else if currentStr == "NumberLong" && b == '(' {
+					return NumberLong
+				} else if currentStr == "NumberDecimal" && b == '(' {
+					return NumberDecimal
+				} else if currentStr == "DBRef" && b == '(' {
+					return DBRef
+				} else if currentStr == "BinData" && b == '(' {
+					return BinData
 				} else {
-					for i := 0; i < counter-1; i++ {
-						l.backup()
+					if b == '"' {
+						lval.val = currentStr
+						return String
 					}
-					return LexError
+					val, err := strconv.ParseFloat(currentStr, 64)
+					if err != nil {
+						lval.val = currentStr
+						return String
+					}
+					lval.val = val
+					return Number
 				}
 			}
 			lval.val = val
 			return Literal
-		}
-		counter++
-	}
-}
-
-func (l *lex) scanObj(lval *yySymType) int {
-	buf := bytes.NewBuffer(nil)
-	objBuf := bytes.NewBuffer(nil)
-	isInside := false
-	for b := l.next(); b != 0; b = l.next() {
-		if b == '"' && !isInside {
-			isInside = true
-		} else if b == '"' && isInside {
-			lval.val = buf.String()
-			if objBuf.String() == "ObjectId(" && len(buf.String()) == 24 {
-				return ObjectID
-			} else if objBuf.String() == "ISODate(" {
-				return ISODate
-			} else if objBuf.String() == "NumberLong(" {
-				return NumberLong
-			} else if objBuf.String() == "NumberDecimal(" {
-				return NumberDecimal
-			} else if objBuf.String() == "DBRef(" {
-				return DBRef
-			} else {
-				return BsonError
-			}
-		} else if isInside {
-			buf.WriteByte(b)
+		} else if unicode.IsSpace(rune(b)) {
+			continue
 		} else {
-			objBuf.WriteByte(b)
+			buf.WriteByte(b)
 		}
 	}
-	return 0
+	return LexError
 }
 
 func (l *lex) backup() {
