@@ -17,10 +17,11 @@ func Parse(input []byte) ([]interface{}, error) {
 }
 
 type lex struct {
-	input  []byte
-	pos    int
-	result []interface{}
-	err    error
+	input     []byte
+	pos       int
+	result    []interface{}
+	err       error
+	isInQuote bool
 }
 
 func newLex(input []byte) *lex {
@@ -59,9 +60,12 @@ func isSpecialCharNoQuote(b byte) bool {
 func (l *lex) scanNormal(lval *yySymType) int {
 	for b := l.next(); b != 0; b = l.next() {
 		switch {
-		case unicode.IsSpace(rune(b)):
+		case unicode.IsSpace(rune(b)) && !l.isInQuote:
 			continue
 		case isSpecialChar(b):
+			if b == '"' {
+				l.isInQuote = !l.isInQuote
+			}
 			return int(b)
 		default:
 			l.backup()
@@ -143,7 +147,7 @@ func (l *lex) scanAll(lval *yySymType) int {
 			}
 			lval.val = val
 			return Literal
-		} else if unicode.IsSpace(rune(b)) {
+		} else if unicode.IsSpace(rune(b)) && !l.isInQuote {
 			continue
 		} else {
 			buf.WriteByte(b)

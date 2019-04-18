@@ -84,6 +84,10 @@ elements:
 
 value:
 Number
+| '"' '"'
+  {
+    $$ = ""
+  }
 | '"' String '"'
   {
     $$ = $2

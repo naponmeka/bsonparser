@@ -24,6 +24,16 @@ func TestParser(t *testing.T) {
 			"a": float64(1),
 		},
 	}, {
+		input: `{a: ""}`,
+		output: map[string]interface{}{
+			"a": "",
+		},
+	}, {
+		input: `{a: "  x  "}`,
+		output: map[string]interface{}{
+			"a": "  x  ",
+		},
+	}, {
 		input: `{a: "hello\n"}`,
 		output: map[string]interface{}{
 			"a": "hello\n",
