@@ -3,6 +3,7 @@ package bsonparser
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -66,7 +67,15 @@ func traverse(
 		hasBinData := false
 		hasRegex := false
 		res := ""
-		for k, v := range val {
+		var keys []string
+		for k := range val {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		normalKeyCounter := 0
+		for _, k := range keys {
+			v := val[k]
+
 			if castToString(k) != `"$ref"` &&
 				castToString(k) != `"$id"` &&
 				castToString(k) != `"$binary"` &&
@@ -76,6 +85,7 @@ func traverse(
 				castToString(k) != `"$options"` {
 				needBracket, res = traverse(false, v, k, level, prefix, indent)
 				results = append(results, res)
+				normalKeyCounter++
 			} else if castToString(k) == `"$ref"` || castToString(k) == `"$id"` {
 				hasRef = true
 			} else if castToString(k) == `"$binary"` || castToString(k) == `"$type"` {
@@ -91,6 +101,9 @@ func traverse(
 				}
 				results = append(results, fmt.Sprintf(`ISODate(%s)`, castToString(val["$date"])))
 			}
+		}
+		if normalKeyCounter > 1 {
+			needBracket = true
 		}
 		if hasRef {
 			results = append(results, fmt.Sprintf(`DBRef(%s, %s)`, castToString(val["$ref"]), castToString(val["$id"])))
