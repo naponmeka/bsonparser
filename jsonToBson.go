@@ -72,6 +72,7 @@ func traverse(
 				castToString(k) != `"$binary"` &&
 				castToString(k) != `"$type"` &&
 				castToString(k) != `"$regex"` &&
+				castToString(k) != `"$date"` &&
 				castToString(k) != `"$options"` {
 				needBracket, res = traverse(false, v, k, level, prefix, indent)
 				results = append(results, res)
@@ -81,6 +82,14 @@ func traverse(
 				hasBinData = true
 			} else if castToString(k) == `"$regex"` || castToString(k) == `"$options"` {
 				hasRegex = true
+			} else if castToString(k) == `"$date"` {
+				switch v := val["date"].(type) {
+				case string:
+					results = append(results, fmt.Sprintf(`ISODate(%s)`, castToString(v)))
+				case map[string]string:
+					results = append(results, fmt.Sprintf(`ISODate(%s)`, castToString(v["$numberLong"])))
+				}
+				results = append(results, fmt.Sprintf(`ISODate(%s)`, castToString(val["$date"])))
 			}
 		}
 		if hasRef {
