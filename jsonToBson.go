@@ -152,10 +152,12 @@ func traverse(
 	}
 }
 
+// JsonToBson converts "Strict mode" MongoDB extended json into MongoDB "Shell mode" representation
 func JsonToBson(jsonStr string) (output string, err error) {
 	return JsonToBsonIndent(jsonStr, "", "    ")
 }
 
+// JsonToBsonIndent is like JsonToBson but applies Indent to format the output. Each JSON element in the output will begin on a new line beginning with prefix followed by one or more copies of indent according to the indentation nesting.
 func JsonToBsonIndent(jsonStr, prefix, indent string) (output string, err error) {
 	jsonStr = strings.TrimSpace(jsonStr)
 	isArray := strings.HasPrefix(jsonStr, "[")
