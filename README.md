@@ -1,5 +1,7 @@
 # bsonparser
 
+[![GoDoc](https://godoc.org/github.com/naponmeka/bsonparser?status.svg)](https://godoc.org/github.com/naponmeka/bsonparser)
+
 bsonparser is bson to json parser written in Go. It converts bson string into MongoDB json extended syntax and the other way around.
 
 ## Installation
@@ -20,6 +22,7 @@ bsonStr, err := bsonparser.JsonToBson(jsonStr)
 ```
 
 ## Example
+Additional examples and documentation can be found under the example directory and [on the godoc.org](https://godoc.org/github.com/naponmeka/bsonparser)
 ```
 bsonStr := `
 {
