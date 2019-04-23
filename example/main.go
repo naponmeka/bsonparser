@@ -32,6 +32,7 @@ func main() {
 				"c": "d"
 			}
 		},
+		"empty": {},
 		"meta" : {
 			"country" : "TH",
 			"reply_to_user_id" : "",

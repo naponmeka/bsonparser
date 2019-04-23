@@ -105,6 +105,9 @@ func traverse(
 		if normalKeyCounter > 1 {
 			needBracket = true
 		}
+		if len(keys) == 0 {
+			results = append(results, "{}")
+		}
 		if hasRef {
 			results = append(results, fmt.Sprintf(`DBRef(%s, %s)`, castToString(val["$ref"]), castToString(val["$id"])))
 		}
